@@ -18,7 +18,7 @@ height = 700
 
 screen = pygame.display.set_mode([width, height])
 
-myfont = pygame.font.SysFont('Comic Sans MS', 20)
+territory_font = pygame.font.SysFont('Comic Sans MS', 10)
 
 running = True
 
@@ -28,8 +28,8 @@ territories = []
 
 territory_count = 5
 
-smallest_r = 50
-highest_r = 100
+smallest_r = 20
+highest_r = 50
 
 
 ################################################################################################
@@ -40,15 +40,17 @@ def map(value, istart, istop, ostart, ostop):
 
 def generate_random_str(n):
     # call random.choices() string module to find the string in Uppercase + numeric data.  
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k = n))    
+    return ''.join(choices(string.ascii_uppercase + string.digits, k = n))    
 
 def init_map():
     for i in range(territory_count):
-        territories.append(Territory((100 + i , 100), generate_random_str(10), randint(smallest_r, highest_r)))
+        territories.append(Territory((100 + i * 2 * highest_r, 100), generate_random_str(5), randint(smallest_r, highest_r)))
 
 ################################################################################################
 #                                           MAIN LOOP
 ################################################################################################
+
+init_map()
 
 while running:
 
@@ -63,7 +65,10 @@ while running:
     # textsurface = myfont.render('Ticks = ' + str(ticks), False, (0, 0, 0))
     # screen.blit(textsurface, (0, 0))
 
-    screen.fill((0, 0, 0))
+    screen.fill((50, 50, 50))
+
+    for territory in territories:
+        territory.draw(screen, territory_font)
 
     ##################################################################
     # Flip the display
