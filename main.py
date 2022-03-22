@@ -4,6 +4,7 @@ import pygame
 from random import *
 
 from territory import Territory
+from utils import vec_d
 
 pygame.init()
 pygame.font.init()
@@ -44,13 +45,35 @@ def generate_random_str(n):
 
 def init_map():
     for i in range(territory_count):
-        territories.append(Territory((100 + i * 2 * highest_r, 100), generate_random_str(5), randint(smallest_r, highest_r)))
+        new_pos = (100 + i * 2 * highest_r, 100)
+        is_new_pos = False
 
+        while True:
+            new_pos = (randint(highest_r, width - highest_r), randint(highest_r, height - highest_r))
+            for terr in territories:
+                d = vec_d(new_pos, terr.position)
+                if d > highest_r:
+                    is_new_pos = True
+                    break
+            if len(territories) == 0 or is_new_pos:
+                break
+
+        territories.append(Territory(new_pos, generate_random_str(5), randint(smallest_r, highest_r)))
+
+
+def get_terr_by_name(name):
+    for terr in territories:
+        if terr.name == name:
+            return terr
+    return None
 ################################################################################################
 #                                           MAIN LOOP
 ################################################################################################
 
 init_map()
+
+territories[0].connected_territories.append(territories[1].name)
+territories[1].connected_territories.append(territories[2].name)
 
 while running:
 
@@ -67,6 +90,16 @@ while running:
 
     screen.fill((50, 50, 50))
 
+
+    # draw connections
+    for territory in territories:
+        for terr_name in territory.connected_territories:
+            terr = get_terr_by_name(terr_name)
+            if terr != None:
+                pygame.draw.line(screen, (0, 0, 0), territory.position, terr.position, 10)
+
+
+    # draw territories
     for territory in territories:
         territory.draw(screen, territory_font)
 
