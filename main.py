@@ -27,9 +27,9 @@ clock = pygame.time.Clock()
 
 territories = []
 
-territory_count = 5
+territory_count = 10
 
-smallest_r = 20
+smallest_r = 10
 highest_r = 50
 
 
@@ -46,15 +46,17 @@ def generate_random_str(n):
 def init_map():
     for i in range(territory_count):
         new_pos = (100 + i * 2 * highest_r, 100)
-        is_new_pos = False
+        
 
         while True:
             new_pos = (randint(highest_r, width - highest_r), randint(highest_r, height - highest_r))
+            is_new_pos = True
             for terr in territories:
                 d = vec_d(new_pos, terr.position)
-                if d > highest_r:
-                    is_new_pos = True
+                if d <= highest_r * 2:
+                    is_new_pos = False
                     break
+                    
             if len(territories) == 0 or is_new_pos:
                 break
 
@@ -72,8 +74,15 @@ def get_terr_by_name(name):
 
 init_map()
 
-territories[0].connected_territories.append(territories[1].name)
-territories[1].connected_territories.append(territories[2].name)
+# territories[0].connected_territories.append(territories[1].name)
+# territories[1].connected_territories.append(territories[2].name)
+
+for terr in territories:
+    while True:
+        rand_index = randint(0, len(territories) - 1)
+        if terr != territories[rand_index]:
+            terr.connected_territories.append(territories[rand_index].name)
+            break
 
 while running:
 
