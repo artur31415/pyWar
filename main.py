@@ -90,6 +90,22 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse_pos = pygame.mouse.get_pos()
+
+            for terr in territories:
+                if terr.collision(mouse_pos):
+                    print("clicked on ", terr.name)
+                    terr.selected = True
+                    break
+
+    ##################################################################
+    # UPDATE CODE
+    ##################################################################
+
+    
+
+
     ##################################################################
     # DRAW CODE
     ##################################################################
