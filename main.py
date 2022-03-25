@@ -85,6 +85,19 @@ def get_tank_by_terr_name(terr_name):
         if tank.territory_name == terr_name:
             return tank
     return None
+
+def get_selected_tank():
+    for tank in my_tanks:
+        if tank.selected == True:
+            return tank
+    return None
+
+def select_tank_by_name(tank_name):
+    for tank in my_tanks:
+        if tank.name == tank_name:
+            tank.selected = True
+        else:
+            tank.selected = False
 ################################################################################################
 #                                           MAIN LOOP
 ################################################################################################
@@ -117,18 +130,32 @@ while running:
             for i in range(len(territories)):
                 if territories[i].collision(mouse_pos):
                     print("clicked on ", territories[i].name)
-                    territories[i].selected = True
-                    if last_selected_terr_index == -1:
-                        selected_tank = get_tank_by_terr_name(territories[selected_terr_index].name)
+                    
+                    if selected_terr_index == -1:
+                        territories[i].selected = True
+                        selected_tank = get_tank_by_terr_name(territories[i].name)
                         if selected_tank != None:
                             selected_tank.territory_name = territories[i].name
-                            selected_tank.position = territories[i].position
-                        last_selected_terr_index = selected_terr_index
-                        #FIXME:
-                        selected_terr_index = -1
-                    else:
-                        last_selected_terr_index = -1
+                            select_tank_by_name(selected_tank.name)
                         selected_terr_index = i
+                    else:
+                        selected_tank = get_selected_tank()
+                        if selected_tank != None:
+                            #TODO: LIMIT MOTION ONLY TO CONNECTED TERRS
+                            terr = get_terr_by_name(selected_tank.territory_name)
+                            has_moved = False
+                            if terr != None:
+                                for connected_terr in terr.connected_territories:
+                                    if connected_terr == territories[i].name:
+                                        selected_tank.territory_name = territories[i].name
+                                        selected_tank.position = territories[i].position
+                                        has_moved = True
+                                        break
+                            if not has_moved:
+                                print("cannot move there!")
+                            select_tank_by_name(None)
+                        last_selected_terr_index = selected_terr_index
+                        selected_terr_index = -1
 
                 elif territories[i].selected:
                     territories[i].selected =False
@@ -164,8 +191,17 @@ while running:
     for tank in my_tanks:
         tank.draw(screen)
 
+    ui_str = ""
+
     if selected_terr_index != -1:
-        textsurface = ui_font.render('Selected territory ' + str(territories[selected_terr_index].name), False, (0, 0, 0))
+        ui_str += 'Selected territory ' + territories[selected_terr_index].name
+
+    selected_tank = get_selected_tank()
+    if selected_tank != None:
+        ui_str += "; selected tank " + selected_tank.name
+
+    if len(ui_str) > 0:
+        textsurface = ui_font.render(ui_str, False, (0, 0, 0))
         screen.blit(textsurface, (0, 0))
     ##################################################################
     # Flip the display

@@ -8,6 +8,7 @@ class Tank:
         self.name = name
         self.territory_name = territory_name
         self.count = count
+        self.selected = False
 
     def draw(self, DISPLAY):
         w = 10
